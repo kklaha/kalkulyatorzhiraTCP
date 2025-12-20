@@ -1,4 +1,4 @@
-﻿#define _WINSOCK_DEPRECATED_NO_WARNINGS 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 
 #include <iostream>
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
@@ -32,23 +32,24 @@ int main() {
 		SOCKET client = accept(s, NULL, NULL);
 		if (client == INVALID_SOCKET) continue;
 		std::cout << "Новый пользователь подключен\n";
-		int bytes = recv(client, buffer, 1023, 0);
-		if (bytes > 0) {
-			buffer[bytes] = '\0';
-			std::istringstream is(buffer);
-			double height, weight;
-			if (is >> height >> weight && height > 0 && weight > 0) {
-				double imt = weight/ pow(height, 2);
-				std::ostringstream os;
-				os <<std::fixed<< imt;
-				std::string res = os.str();
-				send(client, res.c_str(), res.length(), 0);
+			int bytes = recv(client, buffer, 1023, 0);
+			if (bytes > 0) {
+				buffer[bytes] = '\0';
+				std::istringstream is(buffer);
+				double height, weight;
+				if (is >> height >> weight && height > 0 && weight > 0) {
+					double imt = weight / pow(height, 2);
+					std::ostringstream os;
+					os << std::fixed << imt;
+					std::string res = os.str();
+					send(client, res.c_str(), res.length(), 0);
+				}
+				else {
+					const char* error = "Некорректные данные";
+					send(client, error, strlen(error), 0);
+					break;
+				}
 			}
-			else {
-				const char *error = "Некорректные данные";
-				send(client, error, strlen(error), 0);
-			}
-		}
 		closesocket(client);
 		std::cerr << "Клиент отключился ";
 	}
